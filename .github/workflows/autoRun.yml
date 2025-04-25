@@ -1,9 +1,9 @@
-name: Hourly Main Runner
+name: Sync Country Stats
 
 on:
   schedule:
-    # 每小時執行一次 (在每小時的第 0 分)
-    - cron: '0 * * * *'
+    # 每 30 分鐘執行一次
+    - cron: '*/30 * * * *'
   workflow_dispatch: # 允許手動觸發
 
 jobs:
