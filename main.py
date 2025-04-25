@@ -1,53 +1,131 @@
 import datetime
+import time  # 引入 time 模組
 from io import BytesIO
 
+import gspread
 import requests
+from google.oauth2.service_account import Credentials
 from PIL import Image
 
 from countryInfoExtractor import getAllProperties
 
+# --- Google Sheets 設定 ---
+# 確保這個 JSON 檔案與您的 main.py 在同一個目錄，或者提供完整路徑
+CREDENTIALS_FILE = 'nine-sols-db4a615ab067.json'
+SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZAIe7xYvOGJbiaOy9Uo1udba3NY-vtAu9UxQHQ-XJO0/edit?usp=sharing' # <-- Google Sheet 的 URL
+SPREADSHEET_NAME = '九日 混元萬劫 國家狀態' # <-- 用於顯示，可選
+WORKSHEET_NAME = 'Logs' # <-- 通常是 'Sheet1'，如果您的工作表名稱不同請修改
+
+# Google API 的範圍
+SCOPES = [
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/drive.file'
+]
+# --- Google Sheets 設定結束 ---
 
 def preprocess_image(img, threshold=128):
     """將圖片轉換為灰階並進行二值化處理。"""
-    # 1. 轉換為灰階
     gray_img = img.convert('L')
-    # 2. 二值化
     binary_img = gray_img.point(lambda p: p > threshold and 255)
     return binary_img
 
 def main():
+    # --- Google Sheets 驗證與開啟 ---
+    try:
+        creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+        gc = gspread.authorize(creds)
+        # 使用 URL 開啟 Sheet
+        sh = gc.open_by_url(SPREADSHEET_URL)
+        worksheet = sh.worksheet(WORKSHEET_NAME)
+        print(f"成功連接到 Google Sheet (透過 URL): '{sh.title}' -> '{worksheet.title}'")
+
+        # 檢查標頭是否存在，如果不存在則寫入
+        header = ["國家", "軍事", "商業", "科技", "文化", "更新時間"]
+        first_row = worksheet.row_values(1)
+        if not first_row or first_row != header: # 檢查是否為空或不匹配
+            # 如果第一行不為空但與期望標頭不同，先刪除第一行再插入新標頭
+            if first_row:
+                worksheet.delete_rows(1)
+                print("已刪除舊標頭行。")
+            worksheet.insert_row(header, 1)
+            print("已寫入標頭到 Google Sheet")
+
+    except FileNotFoundError:
+        print(f"錯誤：找不到憑證檔案 '{CREDENTIALS_FILE}'。請確保檔案存在且路徑正確。")
+        return
+    except gspread.exceptions.APIError as e:
+        # 更具體地處理權限或 API 未啟用的錯誤
+        if e.response.status_code == 403:
+            print(f"錯誤：權限不足或 API 未啟用。請確保服務帳戶已共享至 Sheet ('{SPREADSHEET_URL}') 並具有編輯權限，且 Google Drive API 和 Sheets API 已啟用。錯誤詳情: {e}")
+        else:
+            print(f"連接 Google Sheets 時發生 API 錯誤: {e}")
+        return
+    except gspread.exceptions.SpreadsheetNotFound:
+        # 這個錯誤現在不太可能發生，因為 URL 通常是唯一的
+        print(f"錯誤：透過 URL '{SPREADSHEET_URL}' 找不到 Google Sheet。請確認 URL 正確且服務帳戶有權限存取。")
+        return
+    except gspread.exceptions.WorksheetNotFound:
+        print(f"錯誤：在 '{sh.title if 'sh' in locals() else SPREADSHEET_URL}' 中找不到名為 '{WORKSHEET_NAME}' 的工作表。")
+        return
+    except Exception as e:
+        print(f"連接 Google Sheets 時發生未預期的錯誤: {e}")
+        return
+    # --- Google Sheets 驗證與開啟結束 ---
+
     # 圖片 URL 列表
     image_urls = [
         "https://cdn.discordapp.com/attachments/1362649898977333360/1365345453616660652/CountryState_Yiguo.png?ex=680cf88b&is=680ba70b&hm=88e867809d6c83d1824ac227e2e4c9aa6702e87b0001784d48950299eee16ef5&",
-        "https://cdn.discordapp.com/attachments/1362649898977333360/1365344598624309389/CountryState_Yumin.png?ex=680cf7bf&is=680ba63f&hm=5cef14a43dae56df83b0363230c5b15cf5f9c10ff8a632aa7ce28e1fe787a958&"
-        # "請在此處加入更多圖片 URL"
-        # "例如: https://example.com/another_image.jpg"
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345326390710282/CountryState_Changuo.png?ex=680cf86c&is=680ba6ec&hm=d270c0122e58c6b751a4dc61aa26462449b7128359ac87259c21ceb84d475516&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365344598624309389/CountryState_Yumin.png?ex=680cf7bf&is=680ba63f&hm=5cef14a43dae56df83b0363230c5b15cf5f9c10ff8a632aa7ce28e1fe787a958&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345354500935864/CountryState_Xiaguo.png?ex=680cf873&is=680ba6f3&hm=feedf2ddfe7dd3ccf27ca2e699f786c5f338746e12b3a4121095c8bd1f793166&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345180919664640/CountryState_Ying.png?ex=680cf84a&is=680ba6ca&hm=c120b19775957be803f1e4d32f677199f98be0ce5ec2dd48d0dc1dc54a2d4b49&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345481496199218/CountryState_Yan.png?ex=680cf891&is=680ba711&hm=f6237195e6fdd177ac8bdd3d09b1ccda3e96e98a77f4f87c258f2d04c6ee87ac&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345427024777318/CountryState_Shang.png?ex=680cf884&is=680ba704&hm=d0aaf9cfd839b0a5facb0d3ed6c803b7bb7e44410d4780ae03798c8f3a944749&",
+        "https://cdn.discordapp.com/attachments/1362649898977333360/1365345376411848754/CountryState_GuiFang.png?ex=680cf878&is=680ba6f8&hm=9cfb1fe9e845f2df752ab20df2570112f219782b9d202e173f6b8efa36bc2b85&"
     ]
 
     for url in image_urls:
         try:
-            # 從 URL 提取檔案名稱
-            filename = url.split('/')[-1].split('?')[0]
-            print(f"--- 正在處理圖片: {filename} ---")
+            base_filename = url.split('/')[-1].split('?')[0]
+            filename = base_filename.removeprefix("CountryState_").removesuffix(".png")
+            print(f"--- 正在處理: {filename} ---")
 
-            response = requests.get(url, timeout=10) # 加入超時
-            response.raise_for_status() # 檢查請求是否成功
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
 
             img = Image.open(BytesIO(response.content))
+            processed_img = preprocess_image(img)
 
-            # 進行圖片預處理
-            processed_img = preprocess_image(img) # 可以傳遞不同的閾值: preprocess_image(img, threshold=150)
+            # (可選) 儲存二值化圖片
+            # processed_img.save(f"binary_{base_filename}.png")
 
-            # (可選) 儲存二值化後的圖片以供檢查
-            processed_img.save(f"binary_{filename}.png") # 建議指定 .png 以避免潛在問題
+            # 獲取屬性字典
+            properties = getAllProperties(processed_img)
+            print(f"提取結果: {properties}")
 
-            getAllProperties(processed_img) # 將處理後的圖片傳遞給 OCR 函式
+            # 準備要寫入 Google Sheet 的行數據
+            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            row_data = [
+                filename,
+                properties.get("Military", ""),
+                properties.get("Trade", ""),
+                properties.get("Tech", ""),
+                properties.get("Culture", ""),
+                timestamp
+            ]
+
+            # 將數據附加到 Google Sheet
+            worksheet.append_row(row_data, value_input_option='USER_ENTERED')
+            print(f"數據已寫入 Google Sheet: {row_data}")
             print("-----------------------------------")
+
+            # 短暫暫停以避免觸發 API 速率限制 (可選)
+            time.sleep(1.5) # 每次寫入後暫停 1.5 秒
 
         except requests.exceptions.RequestException as e:
             print(f"下載圖片時發生錯誤 {url}: {e}")
         except Exception as e:
-            print(f"處理圖片時發生錯誤 {url}: {e}")
+            print(f"處理圖片或寫入 Sheet 時發生錯誤 ({url}): {e}")
 
 if __name__ == "__main__":
     main()

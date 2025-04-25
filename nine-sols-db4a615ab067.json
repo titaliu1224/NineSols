@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "nine-sols",
+  "private_key_id": "db4a615ab06765b24c3d053b757501c2dbeeb379",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCPxnbeBTeKWT7I\nppvSi4BCfd2BNMjQiIXubbxSjM2S739XvZsxDBW4K8MmrSIISWZFxy/pEY2CQOQR\nlPMmjZmHuMvPO5vdOqlq3INlVjC3lu5v9hyNznFTRmEmjkO4X1EmtqJgcSRprclK\nojbBJJyoUDWfSw6kcmowYe4AhSbNDWyuF1WA+BrLdkzCBhk9pU+umbcS0ou5axPD\n/O9vp9j09vnb4JYxZEZq8mOosye/mYDAiGNvvwrljcxCYyPU7osQHC72hNCBlE9K\nAlL5HNCPdOL6DNSJiZSiOAmdk0CTW8wObL/n2WL24D1q87lIN+2xgcXz0uCXiEPP\nCmj4Y3rBAgMBAAECggEAEqjNvYPM0QJDITRqTbl4JGkEaePpWhMV2rtYMRiAB51Y\nmBEOBqAMY5IeajMXEx8/jDfNMoDqLijw0I1Vvz+qWNB1dwhD8sLNwQYscWbtvK30\ndQhqbUcJMycTrbbR+Cg6tn0GduDIOoTo9mw2EfwH7to2E13g4RvOR0g2ZM/jGMJ+\n9xK8qj6VAq11VZXleDODXaTcx6upokj5zS/Cmcn2KqdwJJdVzeP1th2Q1o+ejf8x\n5wQ5onU4ordwQVgT63BxKqkoAZpWdNMWFs1YHLFT/H2czI2TmxWBgXxreU5jfyiI\n1MqREILruqP0n8+6yjCydISxrGiGBpjN/F4MBd4niQKBgQDBi3SlZ3uZvhvx6fTx\nCflSZjCaKORdwr88WmHMftMG9mJTEtwyM9uPYiYj4Hfoc2WEtd/uHQKc/kJuwvr9\nC/GDakA7byvT1PXDJw7+P/1sTCPBQ0V+JrGHFVGFjv6Zj5KA0ZNrMGvAZtLCFZfQ\njmojaLor5g782BLwaoHgEcFkNQKBgQC+K5lCjs00ZjvZmeRt85AxE7tfoBnu4R4f\nIa8/m5doA+uBgfxypDHZPRmiCKho64FTJ4iMuBDd7kZig/yeK0NZ33zKd4z+r5zh\nKs7ieChTTt8kJZ5xvZJQEU32559rHjYox9C2TreYEleTVCT6FG4LI63gimVSuzRb\nOmUY9A013QKBgQCRDxNy8NdriFfrfV0O11ndTyf4MtPODitEcb1BBoDlg/53ovgU\nTFev5HEPjKpyNyMMT0Axd97AibSCzXJN/AicZSMVKKJhlwhHptuO5ajr5TkbHW9V\nOGzwAKNkBaN+tmOoVus1eEoaHzaxLnvlXQfh2BlI05nCGbRAKqOCq+wVTQKBgGj5\nCBCFYyCZjk//cuh+mgl9KuEOL0J9YXMt1N73tAvmnglPB1sA58NSxuN6g/vmg+yy\n1d1XfXgEHzYiRT/KAdOKWggpFdtAdQiV6L16NkhGMUZyvZNrYWhxJOg10vn+I0c/\nhSYdLZr0BQN+XyrsPBJKD6DyxBt22t/AzC2KCgDBAoGAEbllMDMyVRGghnzlPmV/\nQoTfYDwTpnnvS8E1zd59dQK2dcVRDrbSTPCH9PGQYqcpRqv18PnvmRSy/inAppUs\na9+1PxGq6C3iHH6XlT9/ftuqetNh7gC9jHbKNJWPiIn5Zxk4wkaa0mpSnWzQgguG\nlp6th3ISCapxdNg6T7oynCA=\n-----END PRIVATE KEY-----\n",
+  "client_email": "country-stats-updater@nine-sols.iam.gserviceaccount.com",
+  "client_id": "111017373517009341841",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/country-stats-updater%40nine-sols.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
