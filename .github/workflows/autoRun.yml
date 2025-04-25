@@ -33,7 +33,7 @@ jobs:
       - name: Create Google Credentials File
         env:
           GOOGLE_CREDENTIALS_JSON: ${{ secrets.GOOGLE_CREDENTIALS_JSON }}
-        run: echo "$GOOGLE_CREDENTIALS_JSON" > nine-sols-db4a615ab067.json
+        run: echo "$GOOGLE_CREDENTIALS_JSON" > nine-sols-754f9adc71aa.json
         shell: bash
 
       - name: Run main.py
