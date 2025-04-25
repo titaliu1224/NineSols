@@ -1,0 +1,16 @@
+# Google Cloud Credentials
+nine-sols-754f9adc71aa.json
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables
+.env
+
+# IDE / Editor specific files
+.vscode/
+.idea/
+*.swp
+*.swo 

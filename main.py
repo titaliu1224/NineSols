@@ -1,4 +1,6 @@
 import datetime
+import json  # 引入 json 模組
+import os  # 引入 os 模組
 import time  # 引入 time 模組
 from io import BytesIO
 
@@ -10,8 +12,14 @@ from PIL import Image
 from countryInfoExtractor import getAllProperties
 
 # --- Google Sheets 設定 ---
+# 優先從環境變數讀取憑證內容 (用於 GitHub Actions)
+# 否則，從本地檔案讀取 (用於本地測試)
+CREDENTIALS_JSON_CONTENT = os.environ.get('GOOGLE_CREDENTIALS_JSON')
+CREDENTIALS_FILE = 'nine-sols-754f9adc71aa.json'
+
+# --- Google Sheets 設定 ---
 # 確保這個 JSON 檔案與您的 main.py 在同一個目錄，或者提供完整路徑
-CREDENTIALS_FILE = 'nine-sols-db4a615ab067.json'
+CREDENTIALS_FILE = 'nine-sols-754f9adc71aa.json'
 SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZAIe7xYvOGJbiaOy9Uo1udba3NY-vtAu9UxQHQ-XJO0/edit?usp=sharing' # <-- Google Sheet 的 URL
 SPREADSHEET_NAME = '九日 混元萬劫 國家狀態' # <-- 用於顯示，可選
 WORKSHEET_NAME = 'Logs' # <-- 通常是 'Sheet1'，如果您的工作表名稱不同請修改
@@ -32,7 +40,19 @@ def preprocess_image(img, threshold=128):
 def main():
     # --- Google Sheets 驗證與開啟 ---
     try:
-        creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+        creds = None
+        if CREDENTIALS_JSON_CONTENT:
+            print("正在從環境變數載入 Google 憑證...")
+            # 將 JSON 字串轉換為字典
+            creds_dict = json.loads(CREDENTIALS_JSON_CONTENT)
+            creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+        elif os.path.exists(CREDENTIALS_FILE):
+            print(f"正在從本地檔案 '{CREDENTIALS_FILE}' 載入 Google 憑證...")
+            creds = Credentials.from_service_account_file(CREDENTIALS_FILE, scopes=SCOPES)
+        else:
+            print(f"錯誤：找不到 Google 憑證。請確保 '{CREDENTIALS_FILE}' 存在於本地，或已設定 'GOOGLE_CREDENTIALS_JSON' 環境變數。")
+            return
+
         gc = gspread.authorize(creds)
         # 使用 URL 開啟 Sheet
         sh = gc.open_by_url(SPREADSHEET_URL)
@@ -50,8 +70,11 @@ def main():
             worksheet.insert_row(header, 1)
             print("已寫入標頭到 Google Sheet")
 
-    except FileNotFoundError:
+    except FileNotFoundError: # 這個錯誤現在只會在嘗試讀取本地檔案但不存在時發生
         print(f"錯誤：找不到憑證檔案 '{CREDENTIALS_FILE}'。請確保檔案存在且路徑正確。")
+        return
+    except json.JSONDecodeError:
+        print("錯誤：解析環境變數 'GOOGLE_CREDENTIALS_JSON' 中的 JSON 內容失敗。請檢查 GitHub Secrets 中的值是否為有效的 JSON。")
         return
     except gspread.exceptions.APIError as e:
         # 更具體地處理權限或 API 未啟用的錯誤
