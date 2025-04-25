@@ -18,16 +18,10 @@ jobs:
         with:
           python-version: '3.9' # 您可以指定所需的 Python 版本
 
-      - name: Install Tesseract OCR
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tesseract-ocr
-        shell: bash
-
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow pytesseract
+          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow easyocr numpy
         shell: bash
 
       - name: Create Google Credentials File
