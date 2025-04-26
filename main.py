@@ -10,6 +10,7 @@ from google.oauth2.service_account import Credentials
 from PIL import Image
 
 from countryInfoExtractor import getAllProperties
+from selfBotExecutor import get_discord_images_sync  # 引入從 Discord 獲取圖片的函數
 
 # --- Google Sheets 設定 ---
 # 優先從環境變數讀取憑證內容 (用於 GitHub Actions)
@@ -95,17 +96,18 @@ def main():
         return
     # --- Google Sheets 驗證與開啟結束 ---
 
-    # 圖片 URL 列表
-    image_urls = [
-        "https://media.discordapp.net/attachments/1362649898977333360/1365410247962919014/CountryState_Yiguo.png?ex=680d34e3&is=680be363&hm=f4c5b28691684215678ff397ad593ea97c20d8dd36ae8769b66a30e52964d19f&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365412014515556403/CountryState_Changuo.png?ex=680d3688&is=680be508&hm=ed0cd0d4961f7caeab12e2e4ec3dc182e99c8dbbda1afe0054e26b5a34b1ad7c&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365412052759347260/CountryState_Yumin.png?ex=680d3691&is=680be511&hm=8ef78b90e7b8ed0f4da2f17d4484d748241184b9e1a106b3ba2ce2fed917c16a&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365412353088294922/CountryState_Xiaguo.png?ex=680d36d9&is=680be559&hm=1dd93402cedd04440e5b4334d4b225cb239d9e0236206f535ac64453f4c8f378&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365412252693299260/CountryState_Ying.png?ex=680d36c1&is=680be541&hm=98dfc1743182f17daa3481fccdb129a004fdd152a58e03d90f18b7328b9479dc&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365400830471045272/CountryState_Yan.png?ex=680d2c1d&is=680bda9d&hm=60a05dc5a6cb7557cea35d7d4070550d0dd347b69692d08a414704d223df1c52&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365411989517635714/CountryState_Shang.png?ex=680d3682&is=680be502&hm=dd167f8509d2755acf6693b7482173f71dd0e37c87d6d91cd84e3988fbb87687&=&format=webp&quality=lossless&width=550&height=309",
-        "https://media.discordapp.net/attachments/1362649898977333360/1365411433986396280/CountryState_GuiFang.png?ex=680d35fd&is=680be47d&hm=03328add61a888afbe171788196c056dc423704a9e6efd847a79d88ce6e761f8&=&format=webp&quality=lossless&width=550&height=309"
-    ]
+    # 從 Discord 獲取圖片 URL，因為 Discord 的 URL 會過期
+    print("正在從 Discord 獲取最新圖片 URL...")
+    success, discord_urls = get_discord_images_sync()
+    
+    if not success or not discord_urls:
+        print("錯誤：無法從 Discord 獲取圖片 URL")
+        return  # 如果無法獲取 URL，終止程序
+    
+    print(f"成功從 Discord 獲取了 {len(discord_urls)} 個圖片 URL")
+    
+    # 使用從 Discord 獲取的 URL
+    image_urls = discord_urls
 
     for url in image_urls:
         try:
