@@ -22,8 +22,8 @@ CREDENTIALS_FILE = 'nine-sols-754f9adc71aa.json'
 # --- Google Sheets 設定 ---
 # 確保這個 JSON 檔案與您的 main.py 在同一個目錄，或者提供完整路徑
 CREDENTIALS_FILE = 'nine-sols-754f9adc71aa.json'
-SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1ZAIe7xYvOGJbiaOy9Uo1udba3NY-vtAu9UxQHQ-XJO0/edit?usp=sharing' # <-- Google Sheet 的 URL
-SPREADSHEET_NAME = '九日 混元萬劫 國家狀態' # <-- 用於顯示，可選
+SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1_dQZCbZjqBTNgXKay_zd3YrxaDvuH5uu4Hz7-wLCI6g/edit?usp=sharing' # <-- Google Sheet 的 URL
+SPREADSHEET_NAME = '《 九日 | 混元萬劫 》奄國 | 國民能力表及任務列表' # <-- 用於顯示，可選
 WORKSHEET_NAME = 'Logs' # <-- 通常是 'Sheet1'，如果您的工作表名稱不同請修改
 
 # Google API 的範圍
