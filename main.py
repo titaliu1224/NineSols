@@ -149,8 +149,10 @@ def main():
 
         except requests.exceptions.RequestException as e:
             print(f"下載圖片時發生錯誤 {url}: {e}")
+            continue
         except Exception as e:
             print(f"處理圖片或寫入 Sheet 時發生錯誤 ({url}): {e}")
+            continue
 
 if __name__ == "__main__":
     main()

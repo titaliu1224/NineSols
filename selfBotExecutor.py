@@ -230,47 +230,32 @@ async def fetch_images_from_discord():
     
     try:
         # 啟動客戶端並等待它獲取頻道和執行 read_state_status
+        # client.start 會運行直到 on_ready 中調用 self.close()
         log("啟動 Discord 客戶端... (這可能需要一些時間)")
-        # client.start 會運行直到 on_ready 完成
         await client.start(USER_TOKEN)
         
         # 獲取最近一次運行收集到的 URL
+        # 確保 client.last_run_urls 在 client.start() 返回後仍然可訪問
+        # 雖然 client 已關閉，但其屬性應仍然存在
         returned_urls = client.last_run_urls.copy()
         log(f"獲取了 {len(returned_urls)} 個最近運行的 URL")
         
         # 為了診斷，列出所有收集到的 URL
         for i, url in enumerate(returned_urls, 1):
             log(f"  URL {i}: {url}")
+            
     except Exception as e:
         print(f"啟動或運行 Discord 客戶端時發生錯誤: {e}")
+        # 打印詳細錯誤以便調試
+        import traceback
+        traceback.print_exc()
         return []
-    finally:
-        # 確保客戶端被正確關閉
-        # 注意：client.close() 在 on_ready 中被調用了，這裡不需要再次調用，
-        # 但保留 finally 結構以備將來可能的清理操作
-        log("fetch_images_from_discord 的 finally 塊執行")
-        # if not client.is_closed():
-        #     try:
-        #         log("調用 client.close()...")
-        #         await client.close()
-        #         log("client.close() 已完成")
-        #     except Exception as e:
-        #         print(f"關閉 Discord 客戶端時發生錯誤: {e}")
         
-        # 確保所有未完成的任務都被取消
-        try:
-            log("檢查未完成的任務...")
-            tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
-            if tasks:
-                log(f"發現 {len(tasks)} 個待處理的任務，嘗試取消...")
-                for task in tasks:
-                    task.cancel()
-                await asyncio.gather(*tasks, return_exceptions=True)
-                log("所有待處理任務已取消")
-            else:
-                log("沒有發現待處理的任務")
-        except Exception as e:
-            print(f"取消任務時發生錯誤: {e}")
+    finally:
+        # 注意：client.close() 在 on_ready 中被調用了。
+        # 這裡的 finally 主要是為了確保即使 try 塊中發生異常，也能嘗試清理。
+        # 移除顯式的任務取消邏輯，因為它可能導致 CancelledError
+        log("fetch_images_from_discord 的 finally 塊執行")
     
     # 返回最近一次運行收集到的 URL
     log(f"從 Discord 獲取完成，返回 {len(returned_urls)} 個最近運行的 URL")
