@@ -5,6 +5,7 @@ import time  # 引入 time 模組
 from io import BytesIO
 
 import gspread
+import pytz  # 引入 pytz 用於時區處理
 import requests
 from google.oauth2.service_account import Credentials
 from PIL import Image
@@ -32,11 +33,20 @@ SCOPES = [
 ]
 # --- Google Sheets 設定結束 ---
 
+# --- 定義 UTC+8 時區 ---
+UTC8 = pytz.timezone('Asia/Shanghai') # 或者 'Asia/Taipei', 'Asia/Hong_Kong' 等
+
 def preprocess_image(img, threshold=128):
     """將圖片轉換為灰階並進行二值化處理。"""
     gray_img = img.convert('L')
     binary_img = gray_img.point(lambda p: p > threshold and 255)
     return binary_img
+
+def get_current_utc8_time_str():
+    """獲取當前 UTC+8 時間並格式化為字符串"""
+    utc_now = datetime.datetime.now(datetime.timezone.utc)
+    utc8_now = utc_now.astimezone(UTC8)
+    return utc8_now.strftime("%Y-%m-%d %H:%M:%S")
 
 def main():
     # --- Google Sheets 驗證與開啟 ---
@@ -131,7 +141,7 @@ def main():
             print(f"  提取結果 (第一輪): {properties}")
 
             # 準備要寫入 Google Sheet 的行數據
-            timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            timestamp = get_current_utc8_time_str() # 使用 UTC+8 時間
             row_data = [
                 filename,
                 properties.get("Military", ""),
@@ -216,7 +226,7 @@ def main():
                     properties = getAllProperties(processed_img)
                     print(f"  提取結果 (第二輪): {properties}")
 
-                    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                    timestamp = get_current_utc8_time_str() # 使用 UTC+8 時間
                     row_data = [
                         old_filename, # 使用原始檔名
                         properties.get("Military", ""),

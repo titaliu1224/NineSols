@@ -21,7 +21,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow easyocr numpy discord.py-self python-dotenv
+          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow easyocr numpy discord.py-self python-dotenv pytz
         shell: bash
 
       - name: Create Google Credentials File
