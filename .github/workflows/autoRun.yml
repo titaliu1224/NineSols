@@ -21,7 +21,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow easyocr numpy discord.py python-dotenv
+          pip install gspread google-auth-oauthlib google-auth-httplib2 requests Pillow easyocr numpy discord.py-self python-dotenv
         shell: bash
 
       - name: Create Google Credentials File
@@ -30,13 +30,9 @@ jobs:
         run: echo "$GOOGLE_CREDENTIALS_JSON" > nine-sols-754f9adc71aa.json
         shell: bash
 
-      - name: Run selfBotExecutor.py # 新增執行 self bot 的步驟
-        env:
-          DISCORD_USER_TOKEN: ${{ secrets.DISCORD_USER_TOKEN }} # 將 Secret 注入環境變數
-        run: python selfBotExecutor.py
-        shell: bash
-
       - name: Run main.py
+        env:
+          DISCORD_USER_TOKEN: ${{ secrets.DISCORD_USER_TOKEN }}
         run: python main.py
         shell: bash
 
