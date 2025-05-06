@@ -174,8 +174,8 @@ def main():
                 failed_urls.append(url) # 記錄失敗的 URL
                 continue # 繼續處理下一個 URL
             else:
-                 # 如果是 gspread 錯誤，則向上拋出，由外層處理
-                 raise e 
+                # 如果是 gspread 錯誤，則向上拋出，由外層處理
+                raise e 
 
     # --- 第二輪重試處理 --- 
     if failed_urls:
@@ -192,9 +192,9 @@ def main():
             fresh_url_map = {}
             for fresh_url in fresh_discord_urls:
                 try:
-                     base_filename = fresh_url.split('/')[-1].split('?')[0]
-                     filename = base_filename.removeprefix("CountryState_").removesuffix(".png")
-                     fresh_url_map[filename] = fresh_url
+                    base_filename = fresh_url.split('/')[-1].split('?')[0]
+                    filename = base_filename.removeprefix("CountryState_").removesuffix(".png")
+                    fresh_url_map[filename] = fresh_url
                 except Exception as e:
                     print(f"解析新獲取的 URL 時出錯 {fresh_url}: {e}")
             

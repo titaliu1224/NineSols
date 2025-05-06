@@ -1,9 +1,9 @@
 name: Sync Country Stats
 
 on:
-  schedule:
+  # schedule:
     # 每 30 分鐘執行一次
-    - cron: '*/30 * * * *'
+    # - cron: '*/30 * * * *'
   workflow_dispatch: # 允許手動觸發
 
 jobs:
